@@ -1,0 +1,36 @@
+﻿
+
+.example-button-row button,
+.example-button-row a {
+  margin-right: 8px;
+}
+
+.btn:focus,
+.btn.focus {
+  box-shadow: none;
+}
+.btn-space {
+  margin-right: 10px !important;
+}
+
+.btn-success, .btn-outline-success {
+  background: #2ecc71;
+  color: white !important;
+  border: none;
+  &:hover{
+    background: #2ecc71;
+    color: white !important;
+    border: none;
+  }
+}
+
+.btn-danger, .btn-outline-danger {
+  background: #e74c3c;
+  color: white !important;
+  border: none;
+  &:hover{
+    background: #e74c3c;
+    color: white !important;
+    border: none;
+  }
+}
