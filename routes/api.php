@@ -298,6 +298,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('conversations/{conversation_id}/messages','getConversationMessages');
        
     });
+    //Fcm
+    Route::post('/user/fcmtoken', [UserNotificationController::class, 'updateFcmToken']);
 });
 
 Route::get('/i18n/{fileName}', [LanguageController::class, 'downloadFile']);

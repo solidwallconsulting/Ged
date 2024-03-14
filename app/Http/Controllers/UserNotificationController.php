@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Contracts\UserNotificationRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserNotificationController extends Controller
 {
@@ -36,5 +37,16 @@ class UserNotificationController extends Controller
     public function markAllAsRead()
     {
         return  response()->json($this->userNotificationRepository->markAllAsRead(), 200);
+    }
+
+    public function updateFcmToken(Request $request)
+    {
+        $user = Auth::user();
+        $user->update([
+            'fcmToken' => $request->fcm_token
+        ]);
+        return response()->json([
+            'message' => 'Successfully Updated FCM Token'
+        ],200);
     }
 }
