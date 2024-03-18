@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Documents;
 use App\Repositories\Contracts\DocumentAuditTrailRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
+use App\Models\DocumentAuditTrails;
+use Illuminate\Support\Facades\DB;
 
 class DocumentAuditTrailController extends Controller
 {
@@ -55,6 +57,24 @@ class DocumentAuditTrailController extends Controller
     {
         return response()->json($this->documentAuditTrailRepository->saveDocumentAuditTrail($request));
     }
+
+    function documentsTransactions()
+    {
+        $currentYear = now()->year;
+
+        $monthlyOperations = DocumentAuditTrails::select(
+            DB::raw('MONTH(createdDate) as month'),
+            DB::raw('SUM(CASE WHEN operationName = "Download" THEN 1 ELSE 0 END) as download_count'),
+            DB::raw('SUM(CASE WHEN operationName = "Created" THEN 1 ELSE 0 END) as upload_count')
+        )
+            ->whereYear('createdDate', $currentYear)
+            ->whereIn('operationName', ['Download', 'Created'])
+            ->groupBy(DB::raw('MONTH(createdDate)'))
+            ->get();
+
+        return response()->json($monthlyOperations);
+    }
+
 
     public function deleteDocument($id)
     {

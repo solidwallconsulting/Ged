@@ -20,7 +20,7 @@ class Documents extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'categoryId', 'name', 'description', 'url','createdBy',
+        'categoryId', 'name', 'description', 'url', 'extension', 'createdBy',
         'modifiedBy', 'isDeleted'
     ];
 

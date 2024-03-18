@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class ConversationController extends Controller
         // Validate incoming request
         $validator = Validator::make($request->all(), [
             'receiver_id' => 'required|exists:users,id',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'file' => 'nullable|file',
         ]);
 
@@ -30,18 +31,24 @@ class ConversationController extends Controller
         $senderId = Auth::id();
         $receiverId = $request->receiver_id;
         $receiver= Users::where('id',$request->receiver_id)->first();
-        //return response()->json($receiver, 200);
         // Find conversation where both the sender and receiver are the participants
         $conversation = Conversation::whereHas('users', function ($query) use ($senderId) {
             $query->where('user_id', $senderId);
         })->whereHas('users', function ($query) use ($receiverId) {
             $query->where('user_id', $receiverId);
         })->first();
+
+        
+
         // If no conversation exists, we create a new one and we attach both users to the conversation
         if (!$conversation) {
             $conversation = new Conversation();
             $conversation->save();
             $conversation->users()->attach([$senderId, $receiverId]);
+        }else{
+            $conversation->setUpdatedAt(Carbon::now());
+            $conversation->save();
+            
         }
         $message = new Message();
         try {
@@ -98,7 +105,9 @@ class ConversationController extends Controller
             $query->latest()->with('sender', 'receiver');
         }, 'users' => function ($query) use ($user) {
             $query->where('users.id', '!=', $user->id);
-        }])->get();
+        }])
+        ->orderBy('updated_at', 'DESC')
+        ->get();
         return response()->json(["conversations"=>$conversations],200);
     }
 
@@ -115,7 +124,7 @@ class ConversationController extends Controller
             if (!$conversation->users->contains($user)) {
               return response()->json(['error' => 'Unauthorized'], 401);
             }
-            $messages = $conversation->messages()->with('sender', 'receiver')->orderBy('id', 'DESC')->get(); 
+            $messages = $conversation->messages()->with('sender', 'receiver')->orderBy('created_at', 'ASC')->get(); 
             return response()->json(['conversation' => $conversation, 'messages' => $messages]);
         
     }
@@ -127,7 +136,7 @@ class ConversationController extends Controller
         if(isset($message->content))
         $notif->message= substr($message->content, 0, 100);
         else if(isset($message->uploads))
-        $notif->message= 'attached file';
+        $notif->message='attached file';
         $notif->isRead=0;
         if($notif->save())
         {
@@ -154,11 +163,8 @@ class ConversationController extends Controller
         curl_close ( $ch );
         return $result;
         }
-
-
     }
     
 
     
 }
-

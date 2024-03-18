@@ -44,9 +44,11 @@ class UserNotificationRepository extends BaseRepository implements UserNotificat
         $query = UserNotifications::select(['userNotifications.*', 'documents.id as documentId', 'documents.name as documentName'])
             ->where('userNotifications.userId', '=', $userId)
             ->where('documents.isDeleted', '=', false)
+            ->orWhere('userNotifications.documentId', NULL)
             ->orderBy('userNotifications.isRead', 'DESC')
             ->orderBy('userNotifications.createdDate', 'DESC')
             ->leftJoin('documents', 'userNotifications.documentId', '=', 'documents.id');
+
 
         $results = $query->take(10)->get();
 
@@ -62,6 +64,7 @@ class UserNotificationRepository extends BaseRepository implements UserNotificat
         $query = UserNotifications::select(['userNotifications.*', 'documents.id as documentId', 'documents.name as documentName'])
             ->where('userNotifications.userId', '=', $userId)
             ->where('documents.isDeleted', '=', false)
+            ->orWhere('userNotifications.documentId', NULL)
             ->leftJoin('documents', 'userNotifications.documentId', '=', 'documents.id');
 
         $orderByArray =  explode(' ', $attributes->orderBy);

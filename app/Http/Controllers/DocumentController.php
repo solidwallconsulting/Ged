@@ -12,6 +12,7 @@ use App\Repositories\Contracts\UserNotificationRepositoryInterface;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\DB;
 
 class DocumentController extends Controller
 {
@@ -81,6 +82,17 @@ class DocumentController extends Controller
         }
     }
 
+    public function countByExtension()
+    {
+        $documents = Documents::whereNotNull('extension')->groupBy('extension')->select('extension', DB::raw('count(*) as total'))->get();
+        return response()->json($documents, 200);
+    }
+
+
+
+
+
+
     public function readTextDocument($id, $isVersion)
     {
         $bool = filter_var($isVersion, FILTER_VALIDATE_BOOLEAN);
@@ -118,8 +130,8 @@ class DocumentController extends Controller
             'documents',
             Uuid::uuid4() . '.' . $request->file('uploadFile')->getClientOriginalExtension()
         );
-
-        return $this->documentRepository->saveDocument($request, $path);
+        $extension= $request->file('uploadFile')->getClientMimeType();
+        return $this->documentRepository->saveDocument($request, $path, $extension);
     }
 
     public function updateDocument(Request $request, $id)

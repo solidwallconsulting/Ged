@@ -134,7 +134,7 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
     }
 
 
-    public function saveDocument($request, $path)
+    public function saveDocument($request, $path, $extension)
     {
         try {
             DB::beginTransaction();
@@ -143,6 +143,7 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
             $model->categoryId = $request->categoryId;
             $model->name = $request->name;
             $model->description = $request->description;
+            $model->extension = $extension;
             $metaDatas = $request->documentMetaDatas;
             $model->save();
             $this->resetModel();

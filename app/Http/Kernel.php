@@ -42,6 +42,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\UpdateUserStatus::class,
         ],
     ];
 
@@ -65,5 +66,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'hasToken' => \App\Http\Middleware\HasToken::class,
         'cors' => \App\Http\Middleware\corsMiddleware::class,
+        'updateUserStatus' =>\App\Http\Middleware\UpdateUserStatus::class,
     ];
 }

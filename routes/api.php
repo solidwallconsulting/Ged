@@ -46,7 +46,7 @@ Route::get('document/{id}/officeviewer', [DocumentController::class, 'officeview
 Route::get('/companyProfile', [CompanyProfileController::class, 'getCompanyProfile']);
 Route::post('/companyProfile', [CompanyProfileController::class, 'updateCompanyProfile']);
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','updateUserStatus'])->group(function () {
 
     Route::post('auth/refresh', [AuthController::class, 'refresh']);
 
@@ -300,6 +300,10 @@ Route::middleware(['auth'])->group(function () {
     });
     //Fcm
     Route::post('/user/fcmtoken', [UserNotificationController::class, 'updateFcmToken']);
+    //document transaction
+    Route::get('/documents/transactions', [DocumentAuditTrailController::class, 'documentsTransactions']);
+    Route::get('/documents/extension', [DocumentController::class, 'countByExtension']);
+
 });
 
 Route::get('/i18n/{fileName}', [LanguageController::class, 'downloadFile']);
